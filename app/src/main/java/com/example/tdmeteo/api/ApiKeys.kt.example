@@ -1,0 +1,6 @@
+package com.example.tdmeteo.api
+
+object ApiKeys {
+     const val TOMORROW_API_KEY = "TOMORROX_API_KEY"
+     const val GEODB_API_KEY = "GEODB_API_KEY"
+}

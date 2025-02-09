@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "946635345078",
+    "project_id": "appmeteo-104f9",
+    "storage_bucket": "appmeteo-104f9.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:946635345078:android:e253181ed80159fe266a17",
+        "android_client_info": {
+          "package_name": "com.example.tdmeteo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCDDBQ8nOQjEpZ9iPFJm5wNhs09CtwvLoU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
