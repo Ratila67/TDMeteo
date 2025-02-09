@@ -14,6 +14,12 @@ import com.example.tdmeteo.data.CityWeather
 
 class CitiesAdapter : ListAdapter<CityWeather, CitiesAdapter.CityViewHolder>(CityDiffCallback()) {
 
+    private var onItemClickListener: ((CityWeather) -> Unit)? = null
+
+    fun setOnItemClickListener(listener: (CityWeather) -> Unit) {
+        onItemClickListener = listener
+    }
+
     init {
         Log.d("CitiesAdapter", "Adapter initialized")
     }
@@ -22,7 +28,7 @@ class CitiesAdapter : ListAdapter<CityWeather, CitiesAdapter.CityViewHolder>(Cit
         Log.d("CitiesAdapter", "onCreateViewHolder called")
         val view = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_city_weather, parent, false)
-        return CityViewHolder(view)
+        return CityViewHolder(view, onItemClickListener)
     }
 
     override fun onBindViewHolder(holder: CityViewHolder, position: Int) {
@@ -37,7 +43,10 @@ class CitiesAdapter : ListAdapter<CityWeather, CitiesAdapter.CityViewHolder>(Cit
         super.submitList(list)
     }
 
-    class CityViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class CityViewHolder(
+        itemView: View,
+        private val onItemClickListener: ((CityWeather) -> Unit)?
+    ) : RecyclerView.ViewHolder(itemView) {
         init {
             Log.d("CityViewHolder", "ViewHolder created")
         }
@@ -49,7 +58,7 @@ class CitiesAdapter : ListAdapter<CityWeather, CitiesAdapter.CityViewHolder>(Cit
         fun bind(cityWeather: CityWeather) {
             Log.d("CityViewHolder", "Binding data for city: ${cityWeather.cityName}")
             cityName.text = "${cityWeather.cityName}, ${cityWeather.country}"
-            temperature.text = String.format("%.1f°C", cityWeather.temperature)
+            temperature.text = String.format("%.1fÂ°C", cityWeather.temperature)
 
             val iconRes = when (cityWeather.weatherCondition) {
                 "CLEAR" -> R.drawable.ic_sun
@@ -62,6 +71,10 @@ class CitiesAdapter : ListAdapter<CityWeather, CitiesAdapter.CityViewHolder>(Cit
                 else -> R.drawable.ic_sun
             }
             weatherIcon.setImageResource(iconRes)
+
+            itemView.setOnClickListener {
+                onItemClickListener?.invoke(cityWeather)
+            }
         }
     }
 
