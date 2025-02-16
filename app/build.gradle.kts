@@ -97,6 +97,7 @@ dependencies {
     implementation("androidx.recyclerview:recyclerview:1.2.1")
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1")
+    implementation(libs.play.services.location)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

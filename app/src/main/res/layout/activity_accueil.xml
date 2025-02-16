@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="#222222"
+        android:padding="16dp"
+        tools:context=".AccueilActivity">
+
+        <!-- Barre supérieure avec bouton liste -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp">
+
+            <ImageButton
+                android:id="@+id/btn_list"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_alignParentEnd="true"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_list"
+                android:contentDescription="Liste des villes" />
+        </RelativeLayout>
+
+        <!-- Nom de la ville -->
+        <TextView
+            android:id="@+id/location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ma Position"
+            android:textColor="#FFFFFF"
+            android:textSize="14sp"
+            android:layout_gravity="center_horizontal"/>
+
+        <!-- Ville (Dynamique) -->
+        <TextView
+            android:id="@+id/tv_location"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Meudon"
+            android:textColor="@android:color/white"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_gravity="center_horizontal"/>
+
+        <!-- Température (Dynamique) -->
+        <TextView
+            android:id="@+id/tv_temperature"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="11°"
+            android:textColor="@android:color/white"
+            android:textSize="64sp"
+            android:textStyle="bold"
+            android:layout_gravity="center_horizontal"/>
+
+        <!-- Description météo -->
+        <TextView
+            android:id="@+id/tv_weatherDescription"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Avertissement de pluie"
+            android:textColor="#FF5555"
+            android:textSize="16sp"
+            android:layout_gravity="center_horizontal"/>
+
+        <!-- Prévisions heure par heure -->
+        <TextView
+            android:id="@+id/tv_hourly_forecast"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Prévisions heure par heure"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:layout_marginTop="24dp"
+            android:layout_gravity="center_horizontal"/>
+
+        <!-- Liste des prévisions heure par heure -->
+        <LinearLayout
+            android:id="@+id/hourly_forecast_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
+
+            <!-- Exemple d'une prévision (cela peut être dynamique) -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="12°"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:layout_marginEnd="8dp"
+                android:layout_gravity="center"/>
+
+            <!-- Exemple d'une prévision (cela peut être dynamique) -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="13°"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:layout_marginEnd="8dp"
+                android:layout_gravity="center"/>
+
+            <!-- Plus d'éléments peuvent être ajoutés ici -->
+        </LinearLayout>
+
+        <!-- Prévisions sur 5 jours -->
+        <TextView
+            android:id="@+id/tv_daily_forecast"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Prévisions sur 5 jours"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:layout_marginTop="24dp"
+            android:layout_gravity="center_horizontal"/>
+
+        <!-- Liste des prévisions sur 5 jours -->
+        <LinearLayout
+            android:id="@+id/daily_forecast_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="8dp">
+
+            <!-- Exemple de prévision sur 5 jours (cela peut être dynamique) -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Lun\n12°"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:layout_marginEnd="16dp"
+                android:layout_gravity="center"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mar\n13°"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:layout_marginEnd="16dp"
+                android:layout_gravity="center"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mer\n14°"
+                android:textColor="#FFFFFF"
+                android:textSize="14sp"
+                android:layout_marginEnd="16dp"
+                android:layout_gravity="center"/>
+
+            <!-- Plus de jours peuvent être ajoutés ici -->
+        </LinearLayout>
+
+    </LinearLayout>
+</RelativeLayout>
