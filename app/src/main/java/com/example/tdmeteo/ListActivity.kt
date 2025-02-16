@@ -19,11 +19,14 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import java.util.*
 
 class ListActivity : AppCompatActivity() {
     private val database = FirebaseDatabase.getInstance().reference
     private lateinit var citiesAdapter: CitiesAdapter
     private lateinit var recyclerView: RecyclerView
+    private val TAG = "ListActivity"
+    private var valueEventListener: ValueEventListener? = null
 
     //def le launcher pour activite de recherche
     private val searchLauncher = registerForActivityResult(
@@ -43,13 +46,13 @@ class ListActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_list)
 
+        setupRecyclerView()
+
         val fab: FloatingActionButton = findViewById(R.id.buttonAddVille)
         fab.setOnClickListener {
             val intent = Intent(this, SearchActivity::class.java)
-            searchLauncher.launch(intent) // utiliser le launcher au lieu de startActicityForResult
+            searchLauncher.launch(intent) // utiliser le launcher au lieu de startActivityForResult
         }
-        //initiailiser le recycler view et l'adaptateur
-        setupRecyclerView()
 
         //ecoute les changements dans firebase
         listenToFirebaseChanges()
@@ -69,43 +72,43 @@ class ListActivity : AppCompatActivity() {
         citiesAdapter = CitiesAdapter().apply {
             // Ajouter le gestionnaire de clic
             setOnItemClickListener { city ->
-                Log.d("ListActivity", "Clicked on city: ${city.cityName}, temp : ${city.temperature}")
+                Log.d(TAG, "Clicked on city: ${city.cityName}, temp : ${city.temperature}")
 
-                //Créer un nouvel intent et finir l'activité actuelle
-                val intent = Intent(this@ListActivity, MainActivity::class.java)
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                //Créer un nouvel intent avec flag activity reorder to front
+                val intent = Intent(this@ListActivity, MainActivity::class.java).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                }
                 intent.putExtra("city_name", city.cityName)
                 intent.putExtra("city_country", city.country)
                 intent.putExtra("city_temperature", city.temperature)
                 intent.putExtra("city_condition", city.weatherCondition)
 
                 //Verifier que les extras sont correctement définis
-                Log.d("ListActivity", "Intent extras before start: ${intent.extras?.keySet()?.joinToString()}")
-                Log.d("ListActivity","City name in intent: ${intent.getStringExtra("City_name")}")
+                Log.d(TAG, "Intent extras before start: ${intent.extras?.keySet()?.joinToString()}")
+                Log.d(TAG,"City name in intent: ${intent.getStringExtra("city_name")}")
 
-                //Démarrer mainActivity avec les données de la ville sélectionnée
+                //Démarrer mainActivity sans la recreer
                 startActivity(intent)
                 finish()
             }
         }
-        recyclerView.adapter = citiesAdapter
+        recyclerView.adapter = citiesAdapter ?: return
     }
 
     private fun listenToFirebaseChanges() {
-        database.child("cities").addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(snapshot: DataSnapshot) {
-                Log.d(
-                    "MainActivity",
-                    "Firebase data changed, snapshot has ${snapshot.childrenCount} items"
-                )
+            valueEventListener = object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+
+                Log.d(TAG, "Firebase data changed, snapshot has ${snapshot.childrenCount} items")
+
                 val cities = mutableListOf<CityWeather>()
                 for (citySnapshot in snapshot.children) {
                     citySnapshot.getValue(CityWeather::class.java)?.let {
-                        Log.d("MainActivity", "Adding city: ${it.cityName}")
+                        Log.d(TAG, "Adding city: ${it.cityName}")
                         cities.add(it)
                     }
                 }
-                Log.d("MainActivity", "Submitting ${cities.size} cities to adapter")
+                Log.d(TAG, "Submitting ${cities.size} cities to adapter")
 
                 //utiliser une nouvelle liste
                 citiesAdapter.submitList(ArrayList(cities))
@@ -118,7 +121,15 @@ class ListActivity : AppCompatActivity() {
                     Toast.LENGTH_SHORT
                 ).show()
             }
+        }
+            database.child("cities").addValueEventListener(valueEventListener!!)
+        }
 
-        })
+    override fun onDestroy() {
+        super.onDestroy()
+        //supprimer le listener lorsque l'activité est détruite
+        valueEventListener?.let {
+            database.child("cities").removeEventListener(it)
+    }
     }
 }

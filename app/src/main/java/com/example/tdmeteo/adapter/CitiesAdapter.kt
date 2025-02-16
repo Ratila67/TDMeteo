@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tdmeteo.R
 import com.example.tdmeteo.data.CityWeather
+import java.util.Locale
 
 class CitiesAdapter : ListAdapter<CityWeather, CitiesAdapter.CityViewHolder>(CityDiffCallback()) {
 
@@ -58,7 +59,7 @@ class CitiesAdapter : ListAdapter<CityWeather, CitiesAdapter.CityViewHolder>(Cit
         fun bind(cityWeather: CityWeather) {
             Log.d("CityViewHolder", "Binding data for city: ${cityWeather.cityName}")
             cityName.text = "${cityWeather.cityName}, ${cityWeather.country}"
-            temperature.text = String.format("%.1fÂ°C", cityWeather.temperature)
+            temperature.text = String.format(Locale.FRANCE,"%.1f°C", cityWeather.temperature)
 
             val iconRes = when (cityWeather.weatherCondition) {
                 "CLEAR" -> R.drawable.ic_sun

@@ -17,7 +17,6 @@
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         android:visibility="visible"
-        android:background="#303030"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -79,7 +78,7 @@
                     android:id="@+id/ville_nom"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Meudon"
+                    android:text=""
                     android:textColor="@color/white"
                     android:textSize="18sp"
                     android:textStyle="bold" />
@@ -88,7 +87,7 @@
                     android:id="@+id/precision"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Avertissement de vents"
+                    android:text=""
                     android:textColor="@color/alert"
                     android:textSize="14sp" />
             </LinearLayout>
@@ -99,7 +98,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="11°"
+                android:text=""
                 android:textColor="@color/alert"
                 android:textSize="24sp" />
         </LinearLayout>

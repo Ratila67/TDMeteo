@@ -22,7 +22,9 @@ class MainActivity : AppCompatActivity() {
 
         // Configurer le bouton pour aller à la liste
         findViewById<ImageButton>(R.id.btn_list).setOnClickListener {
-            startActivity(Intent(this, ListActivity::class.java))
+            val intent = Intent(this, ListActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+            startActivity(intent)
         }
 
         // Verifier si on a recu une ville specifique
