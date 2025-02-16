@@ -28,11 +28,11 @@ data class Values(
 interface WeatherApi {
     @GET("v4/timelines")
     suspend fun getWeather(
-        @Query("location") location: String,
-        @Query("fields") fields: String = "temperature,weatherCode", // ✅ Ajout de `weatherCode`
-        @Query("timesteps") timesteps: String = "current",
-        @Query("units") units: String = "metric",
-        @Query("apikey") apiKey: String
+        @Query("location") location: String,       // Coordonnées géographiques
+        @Query("apikey") apiKey: String,           // Votre clé API
+        @Query("fields") fields: String = "temperature,weatherCode",  // Les champs à récupérer
+        @Query("timesteps") timesteps: String = "1h",  // Intervalle de temps (1 heure)
+        @Query("units") units: String = "metric"    // Unités des températures
     ): WeatherResponse
 
 }

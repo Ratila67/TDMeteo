@@ -7,12 +7,17 @@ import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.MotionEvent
+import android.view.View
+import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.tdmeteo.api.TomorrowApi
 import com.example.weatherapp.network.RetrofitInstance
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -20,6 +25,7 @@ import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
 import java.util.*
 
 class AccueilActivity : ComponentActivity() {
@@ -116,37 +122,69 @@ class AccueilActivity : ComponentActivity() {
                 val addressList = geocoder.getFromLocation(latitude, longitude, 1)
                 val city = addressList?.firstOrNull()?.locality ?: "Ville inconnue"
 
-                val response = RetrofitInstance.api.getWeather(location = location, apiKey = API_KEY) // ✅ Bien déclarée ici !
+                val response = RetrofitInstance.api.getWeather(location, API_KEY)
 
-                Log.d("WeatherApp", "Réponse API : $response") // 🔍 Voir la réponse API
+                val calendar = Calendar.getInstance()
+                val currentHour = calendar.get(Calendar.HOUR_OF_DAY)
+                val roundedHours = getRoundedHours(currentHour)
 
-                val firstTimeline = response.data.timelines.firstOrNull()
-                val firstInterval = firstTimeline?.intervals?.firstOrNull()
-
-                if (firstInterval != null) {
-                    val temperature = firstInterval.values.temperature
-                    val weatherCode = firstInterval.values.weatherCode
-
-                    Log.d("WeatherApp", "Température: $temperature, Code météo: $weatherCode") // 🔍 Vérifier les valeurs
-
-                    val weatherDescription = getWeatherDescription(weatherCode)
-
-                    runOnUiThread {
-                        onWeatherFetched("$temperature°C", city, weatherDescription)
-                    }
-                } else {
-                    Log.e("WeatherApp", "Données indisponibles")
-                    runOnUiThread {
-                        onWeatherFetched("Erreur", "Inconnue", "Données indisponibles")
-                    }
+                val hourlyForecast = response.data.timelines.firstOrNull()?.intervals?.take(24)?.mapIndexed { index, it ->
+                    Pair(roundedHours[index], it.values.temperature)
                 }
 
+                val nextDays = getNextDays(calendar.get(Calendar.DAY_OF_WEEK))
+                val dailyForecast = response.data.timelines.firstOrNull()?.intervals?.take(5)?.mapIndexed { index, it ->
+                    Pair(nextDays[index], it.values.temperature)
+                }
+
+                runOnUiThread {
+                    onWeatherFetched("${hourlyForecast?.first()?.second ?: "0"}°", city, getWeatherDescription(response.data.timelines.firstOrNull()?.intervals?.firstOrNull()?.values?.weatherCode ?: 0))
+                    updateHourlyForecast(hourlyForecast)
+                    updateDailyForecast(dailyForecast)
+                }
             } catch (e: Exception) {
                 Log.e("WeatherApp", "Erreur API : ${e.message}")
                 runOnUiThread {
                     onWeatherFetched("Erreur", "Inconnue", "Erreur météo")
                 }
             }
+        }
+    }
+    private fun getRoundedHours(currentHour: Int): List<String> {
+        val hours = mutableListOf<String>()
+        var startHour = (currentHour + 1) % 24
+        for (i in 0 until 24) {
+            hours.add(String.format("%02d:00", startHour))
+            startHour = (startHour + 1) % 24
+        }
+        return hours
+    }
+    private fun getNextDays(currentDay: Int): List<String> {
+        val days = mutableListOf<String>()
+        val dateFormat = SimpleDateFormat("EEE", Locale.getDefault())
+        val calendar = Calendar.getInstance()
+        calendar.add(Calendar.DAY_OF_YEAR, 1) // Commence par le jour suivant
+
+        for (i in 0 until 5) {
+            days.add(dateFormat.format(calendar.time))
+            calendar.add(Calendar.DAY_OF_YEAR, 1)
+        }
+        return days
+    }
+
+    private fun updateDailyForecast(dailyForecast: List<Pair<String, Double>>?) {
+        val recyclerView = findViewById<RecyclerView>(R.id.recyclerViewDailyForecast)
+        dailyForecast?.let {
+            recyclerView.adapter = DailyForecastAdapter(it)
+            recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        }
+    }
+
+    private fun updateHourlyForecast(hourlyForecast: List<Pair<String, Double>>?) {
+        val recyclerView = findViewById<RecyclerView>(R.id.recyclerViewHourlyForecast)
+        hourlyForecast?.let {
+            recyclerView.adapter = HourlyForecastAdapter(it)
+            recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         }
     }
 
@@ -218,5 +256,46 @@ class AccueilActivity : ComponentActivity() {
             else -> "Inconnu ($weatherCode)"
         }
     }
-
 }
+class HourlyForecastAdapter(private val hourlyForecast: List<Pair<String, Double>>) : RecyclerView.Adapter<HourlyForecastAdapter.HourlyForecastViewHolder>() {
+
+    class HourlyForecastViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val textViewTime: TextView = view.findViewById(R.id.textViewHourlyTime)
+        val textViewTemp: TextView = view.findViewById(R.id.textViewHourlyForecast)
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HourlyForecastViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_hourly_forecast, parent, false)
+        return HourlyForecastViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: HourlyForecastViewHolder, position: Int) {
+        val (time, temperature) = hourlyForecast[position]
+        holder.textViewTime.text = time
+        holder.textViewTemp.text = "${temperature}°C"
+    }
+
+    override fun getItemCount(): Int = hourlyForecast.size
+}
+
+class DailyForecastAdapter(private val dailyForecast: List<Pair<String, Double>>) : RecyclerView.Adapter<DailyForecastAdapter.DailyForecastViewHolder>() {
+
+    class DailyForecastViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+        val textViewDay: TextView = view.findViewById(R.id.textViewDailyDay)
+        val textViewTemp: TextView = view.findViewById(R.id.textViewDailyForecast)
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DailyForecastViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.item_daily_forecast, parent, false)
+        return DailyForecastViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: DailyForecastViewHolder, position: Int) {
+        val (day, temperature) = dailyForecast[position]
+        holder.textViewDay.text = day
+        holder.textViewTemp.text = "${temperature}°C"
+    }
+
+    override fun getItemCount(): Int = dailyForecast.size
+}
+

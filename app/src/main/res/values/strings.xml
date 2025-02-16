@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">TDMeteo</string>
     <string name="title_activity_search">SearchActivity</string>
+    <string name="_18_c">18°C</string>
 </resources>

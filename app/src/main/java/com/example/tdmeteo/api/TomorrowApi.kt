@@ -16,6 +16,14 @@ interface TomorrowApi {
         @Query("apikey") apiKey: String = API_KEY, // clé API
         @Query("units") units: String = "metric" // mesure
     ): Call<WeatherResponse>
+
+    @GET("v4/timelines")
+    fun getForecast(
+        @Query("location") location: String,
+        @Query("apikey") apiKey: String = API_KEY,
+        @Query("fields") fields: String = "temperature,weatherCode",
+        @Query("timesteps") timesteps: String = "1h"
+    ): Call<ForecastResponse>
 }
 
 data class WeatherResponse(
@@ -53,3 +61,15 @@ data class CityResponse(
         TODO("Not yet implemented")
     }
 }
+data class ForecastResponse(
+    val data: ForecastData
+)
+
+data class ForecastData(
+    val timeline: List<Timeline>
+)
+data class Timeline(
+    val timestamp: String,
+    val temperature: Double,
+    val weatherCode: Int
+)
